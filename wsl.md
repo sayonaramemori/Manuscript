@@ -52,9 +52,7 @@ bye
 explorer.exe .
 
 # Back to Linux
-sudo mv ~/Country.mmdb /etc/mihomo/ && sudo mv ~/clash-verge.yaml /etc/mihomo/config.yaml
-
-sudo vim /etc/mihomo/config.yaml
+sudo mv ~/Country.mmdb /etc/mihomo/ && sudo mv ~/clash-verge.yaml /etc/mihomo/config.yaml  && sudo vim /etc/mihomo/config.yaml
 
 # before
 external-controller: 127.0.0.1:9097
@@ -66,7 +64,7 @@ external-controller: 0.0.0.0:9097
 ```
 # Port is set in config.yaml with configuration item -- port.
 
-sudo systemctl restart mihomo &&
+sudo systemctl start mihomo &&
 curl -i google.com --proxy http://127.0.0.1:7899
 
 # If failing, try below and inspect the log
@@ -101,12 +99,14 @@ ifconfig | grep inet
 # My port is 7899 here 
 # You should see some information of the node you just have selected
 
+clear
+
 cat << 'EOF' > ~/test_dashboard.sh
 #!/bin/bash
 curl -i google.com --proxy http://127.0.0.1:7899
 curl -i youtube.com --proxy http://127.0.0.1:7899
 curl -i baidu.com --proxy http://127.0.0.1:7899
-journalctl -u mihomo | tail
+journalctl -u mihomo | tail -n 3
 EOF
 
 chmod +x ~/test_dashboard.sh &&
@@ -127,15 +127,11 @@ export http_proxy=http://127.0.0.1:7899 && export https_proxy=$http_proxy
 ### 3.1 安装 Neovim  
 > [Github home page](https://github.com/neovim/neovim/blob/master/INSTALL.md)  
 
-> 安装后 **执行** `source ~/.bashrc`  
+> 安装后 **执行** `export PATH=$PATH:/opt/nvim-linux64/bin && source ~/.bashrc`  
 ```shell
 curl -LO --proxy http://127.0.0.1:7899 https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz &&
 sudo rm -rf /opt/nvim  &&
 sudo tar -C /opt -xzf nvim-linux64.tar.gz
-
-cat << 'EOF' >> ~/.bashrc
-export PATH="$PATH:/opt/nvim-linux64/bin"
-EOF
 ```
 
 ### 3.2 配置 Neovim  
