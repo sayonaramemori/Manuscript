@@ -133,7 +133,6 @@ rm ~/test_dashboard.sh
 > 首先运行如下指令  
 ```shell
 export http_proxy=http://127.0.0.1:7899 && export https_proxy=$http_proxy
-sudo apt install gcc nodejs
 ```
 
 
@@ -156,6 +155,8 @@ source ~/.bashrc
 > 这里简要介绍一下个人配置，可自行搜索Neovim相关配置 :D  
 >> 推荐配置： [LunarVim](https://github.com/LunarVim/LunarVim)  
 ```
+git clone https://github.com/sayonaramemori/Manuscript.git
+cd Manuscript && cd nvim
 mkdir ~/.config/nvim -p
 cp ./init.lua ~/.config/nvim/init.lua  
 cp -r ./lua ~/.config/nvim/
@@ -222,6 +223,10 @@ del "%tmpfile%"
 ```
 mkdir ~/.config/yazi -p
 cp ./* ~/.config/yazi/
+
+# Install some plugins
+ya pack -a h-hg/yamb
+ya pack -a yazi-rs/plugins:full-border
 ```
 
 #### 指定 Neovim 为编辑器  
@@ -237,6 +242,8 @@ edit = [
 ```
 
 ### 4.4 Plugins  
+> [Awesome Plugins](https://yazi-rs.github.io/docs/resources)  
+
 
 #### BookMarks  
 > Use [yamb.yazi](https://github.com/h-hg/yamb.yazi)  
@@ -339,15 +346,4 @@ require("full-border"):setup {
 	type = ui.Border.ROUNDED,
 }
 ```
-
-
-
-
-
-
-
-
-
-
-
 

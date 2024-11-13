@@ -25,7 +25,7 @@ vim.g.maplocalleader = "\\"
 require("lazy").setup({
   spec = {
     -- add your plugins here
-    {
+--[[     {
           "iamcco/markdown-preview.nvim",
           cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
           build = "cd app && npm install",
@@ -33,7 +33,7 @@ require("lazy").setup({
             vim.g.mkdp_filetypes = { "markdown" }
           end,
           ft = { "markdown" },
-    },
+    }, ]]
     {
         "nvim-tree/nvim-tree.lua",
          version = "*",
