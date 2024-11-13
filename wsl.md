@@ -22,6 +22,11 @@ wsl --import <Distro> <InstallLocation> <FileName>
 2. 点击要配置的终端选项卡, 进入 **外观设置** ,将字体设置为下载的 **NerdFont**  
 3. 依个人喜好设置 **配色方案** ，**背景图像** 和 **透明度** 等
 
+### 1.4 Ubuntu Prerequisite  
+```
+sudo apt update && sudo apt install -y net-tools gcc unzip 
+```
+
 ## 2. Mihomo  
 
 - [Github Page](https://github.com/MetaCubeX/mihomo/tree/v1.18.10)  
@@ -89,9 +94,8 @@ sudo cat /etc/mihomo/config.yaml >> /etc/mihomo/temp.yaml  &&
 sudo mv /etc/mihomo/temp.yaml /etc/mihomo/config.yaml  &&
 sudo mkdir /etc/mihomo/ui -p &&
 sudo systemctl restart mihomo &&
-sudo apt update &&
-sudo apt install net-tools &&
-ifconfig | grep inet
+ip=`ifconfig | grep inet | grep -v 127.0.0.1 | grep -v inet6 | awk '{print$2}'`
+echo "DashBoard-Url: http://${ip}:9097/ui"
 ```
 
 > Test whether web-GUI works fine. Access via http://IP:9097/ui
@@ -127,12 +131,11 @@ export http_proxy=http://127.0.0.1:7899 && export https_proxy=$http_proxy
 ### 3.1 安装 Neovim  
 > [Github home page](https://github.com/neovim/neovim/blob/master/INSTALL.md)  
 
-> 安装后 **执行** `echo "export PATH=$PATH:/opt/nvim-linux64/bin" >> ~/.bashrc && source ~/.bashrc`  
+> 安装后 **执行** `echo 'export PATH=$PATH:/opt/nvim-linux64/bin' >> ~/.bashrc && source ~/.bashrc`  
 ```shell
 curl -LO --proxy http://127.0.0.1:7899 https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz &&
 sudo rm -rf /opt/nvim  &&
-sudo tar -C /opt -xzf nvim-linux64.tar.gz &&
-sudo apt install gcc
+sudo tar -C /opt -xzf nvim-linux64.tar.gz
 ```
 
 ### 3.2 配置 Neovim  
@@ -157,7 +160,6 @@ echo "Done! Using nvim to start editing"
 # 通过 Official release 安装
 cd ~/Manuscript/yazi &&
 curl -L --proxy http://127.0.0.1:7899 https://github.com/sxyazi/yazi/releases/download/v0.3.3/yazi-x86_64-unknown-linux-musl.zip -o yazi.zip  &&
-sudo apt install unzip  &&
 unzip yazi.zip  &&
 cd yazi-x86_64-unknown-linux-musl  &&
 sudo mv ./yazi /usr/bin/  &&
