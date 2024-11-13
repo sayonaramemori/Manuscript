@@ -35,9 +35,7 @@ wsl --import <Distro> <InstallLocation> <FileName>
 # Using Github proxy ,here is https://ghp.ci
 # My cpu architecture is x86_64. Choose your version.
 
-curl -L https://ghp.ci/https://github.com/MetaCubeX/mihomo/releases/download/v1.18.10/mihomo-linux-amd64-compatible-go120-v1.18.10.deb -o mihomo.deb
-
-# Simply install it via apt  
+curl -L https://ghp.ci/https://github.com/MetaCubeX/mihomo/releases/download/v1.18.10/mihomo-linux-amd64-compatible-go120-v1.18.10.deb -o mihomo.deb  &&
 sudo apt install ./mihomo.deb
 ```
 2. 在 Windows 中打开配置目录，复制 `clash-verge.yaml` and `Country.mmdb` 到 `/etc/mihomo`  
@@ -54,11 +52,10 @@ bye
 explorer.exe .
 
 # Back to Linux
-cd /etc/mihomo
-sudo cp ~/Country.mmdb .
-sudo cp ~/clash-verge.yaml ./config.yaml
+sudo mv ~/Country.mmdb /etc/mihomo/
+sudo mv ~/clash-verge.yaml /etc/mihomo/config.yaml
 
-sudo vim config.yaml
+sudo vim /etc/mihompo/config.yaml
 # before
 external-controller: 127.0.0.1:9097
 # after
@@ -67,16 +64,13 @@ external-controller: 0.0.0.0:9097
 
 3. Do Test  
 ```
-# Start mihomo
-sudo systemctl start mihomo
-
 # Port is set in config.yaml with configuration item -- port.
+
+sudo systemctl restart mihomo &&
 curl -i google.com --proxy http://127.0.0.1:7899
 
-# It should return some information with status code 301 if it works well.
-
 # If failing, try below and inspect the log
-journalctl -u mihomo
+# journalctl -u mihomo
 ```
 
 ### 2.2 配置 Web 仪表盘  
@@ -101,8 +95,8 @@ sudo systemctl restart mihomo
 
 > Open Dashboard in windows browser  
 ```
-sudo apt update
-sudo apt install net-tools
+sudo apt update &&
+sudo apt install net-tools &&
 ifconfig
 
 # Access via http://IP:9097/ui
@@ -111,7 +105,7 @@ ifconfig
 > Test whether web-GUI works fine  
 ```
 # My port is 7899 here 
-# Create a test script
+# You should see some information of the node you just have selected
 
 cat << 'EOF' > ~/test_dashboard.sh
 #!/bin/bash
@@ -121,9 +115,7 @@ curl -i baidu.com --proxy http://127.0.0.1:7899
 journalctl -u mihomo | tail
 EOF
 
-chmod +x ~/test_dashboard.sh
-
-# You should see some information of the node you just have selected
+chmod +x ~/test_dashboard.sh &&
 bash ~/test_dashboard.sh &&
 rm ~/test_dashboard.sh
 ```
@@ -133,32 +125,32 @@ rm ~/test_dashboard.sh
 > 首先运行如下指令  
 ```shell
 export http_proxy=http://127.0.0.1:7899 && export https_proxy=$http_proxy
-sudo apt install gcc nodejs
 ```
 
 
 ### 3.1 安装 Neovim  
 > [Github home page](https://github.com/neovim/neovim/blob/master/INSTALL.md)  
+> 安装后执行 `source ~/.bashrc`  
 ```shell
-curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz
-sudo rm -rf /opt/nvim
+curl -LO --proxy http://127.0.0.1:7899 https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz &&
+sudo rm -rf /opt/nvim  &&
 sudo tar -C /opt -xzf nvim-linux64.tar.gz
 
 cat << 'EOF' >> ~/.bashrc
 export PATH="$PATH:/opt/nvim-linux64/bin"
 EOF
-
-source ~/.bashrc
 ```
-
 
 ### 3.2 配置 Neovim  
-> 这里简要介绍一下个人配置，可自行搜索Neovim相关配置 :D  
+> 这里套用个人配置，可自行搜索Neovim相关配置 :D  
 >> 推荐配置： [LunarVim](https://github.com/LunarVim/LunarVim)  
 ```
-mkdir ~/.config/nvim -p
-cp ./init.lua ~/.config/nvim/init.lua  
-cp -r ./lua ~/.config/nvim/
+git clone https://github.com/sayonaramemori/Manuscript.git  &&
+cd Manuscript && cd nvim &&
+mkdir ~/.config/nvim -p &&
+cp ./init.lua ~/.config/nvim/init.lua &&
+cp -r ./lua ~/.config/nvim/ &&
+echo "Done! Using nvim to start editing"
 ```
 
 
@@ -168,12 +160,12 @@ cp -r ./lua ~/.config/nvim/
 > [Official Docs](https://yazi-rs.github.io/docs/installation)  
 ```shell
 # 通过 Official release 安装
-mkdir yazi && cd yazi
-curl -L https://github.com/sxyazi/yazi/releases/download/v0.3.3/yazi-x86_64-unknown-linux-musl.zip -o yazi.zip
-sudo apt install unzip
-unzip yazi.zip
-cd yazi-x86_64-unknown-linux-musl
-sudo mv ./yazi /usr/bin/
+cd ~/Manuscript/yazi &&
+curl -L --proxy http://127.0.0.1:7899 https://github.com/sxyazi/yazi/releases/download/v0.3.3/yazi-x86_64-unknown-linux-musl.zip -o yazi.zip  &&
+sudo apt install unzip  &&
+unzip yazi.zip  &&
+cd yazi-x86_64-unknown-linux-musl  &&
+sudo mv ./yazi /usr/bin/  &&
 sudo mv ./ya /usr/bin/
 ```
 
@@ -181,6 +173,7 @@ sudo mv ./ya /usr/bin/
 ### 4.2 Shell Wrapper  
 > Provides the ability to change the current working directory when exiting Yazi.
 >> Use `ra` to invoke Yazi.  
+>> Run `source ~/.bashrc` after operation  
 ```shell
 # For bash or zsh
 
@@ -194,9 +187,8 @@ function ra() {
 	rm -f -- "$tmp"
 }
 EOF
-
-source ~/.bashrc
-
+```
+```cmd
 # For windows, Create the file ra.cmd and place it in your %PATH%.
 # For Command Prompt
 
@@ -220,8 +212,11 @@ del "%tmpfile%"
 > For Windows, `C:\Users\Username\AppData\Roming\yazi\config\` is the right place.  
 
 ```
-mkdir ~/.config/yazi -p
-cp ./* ~/.config/yazi/
+mkdir ~/.config/yazi -p &&
+cd ~/Manuscript/yazi    &&
+cp ./* ~/.config/yazi/  &&
+ya pack -a h-hg/yamb    &&
+ya pack -a yazi-rs/plugins:full-border
 ```
 
 #### 指定 Neovim 为编辑器  
@@ -237,6 +232,8 @@ edit = [
 ```
 
 ### 4.4 Plugins  
+> [Awesome Plugins](https://yazi-rs.github.io/docs/resources)  
+
 
 #### BookMarks  
 > Use [yamb.yazi](https://github.com/h-hg/yamb.yazi)  
@@ -339,15 +336,4 @@ require("full-border"):setup {
 	type = ui.Border.ROUNDED,
 }
 ```
-
-
-
-
-
-
-
-
-
-
-
 
