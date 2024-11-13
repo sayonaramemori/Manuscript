@@ -57,14 +57,21 @@ explorer.exe .
 cd /etc/mihomo
 sudo cp ~/Country.mmdb .
 sudo cp ~/clash-verge.yaml ./config.yaml
+
+sudo vim config.yaml
+# before
+external-controller: 127.0.0.1:9097
+# after
+external-controller: 0.0.0.0:9097
 ```
+
 3. Do Test  
 ```
 # Start mihomo
 sudo systemctl start mihomo
 
 # Port is set in config.yaml with configuration item -- port.
-curl -i google.com --proxy http://127.0.0.1:[YOUR_HTTP(S)_PORT]
+curl -i google.com --proxy http://127.0.0.1:7899
 
 # It should return some information with status code 301 if it works well.
 
@@ -82,13 +89,23 @@ journalctl -u mihomo
 # Do remember set secret for security.
 
 sudo cat << 'EOF' > /etc/mihomo/temp.yaml
-external-ui: /etc/mihomo/
+external-ui: /etc/mihomo/ui
 external-ui-name: my-ui
 external-ui-url: "https://ghp.ci/https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip"
 EOF
 sudo cat /etc/mihomo/config.yaml >> /etc/mihomo/temp.yaml  &&
 sudo mv /etc/mihomo/temp.yaml /etc/mihomo/config.yaml  &&
+sudo mkdir /etc/mihomo/ui -p &&
 sudo systemctl restart mihomo
+```
+
+> Open Dashboard in windows browser  
+```
+sudo apt update
+sudo apt install net-tools
+ifconfig
+
+# Access via http://IP:9097/ui
 ```
 
 > Test whether web-GUI works fine  
@@ -96,7 +113,7 @@ sudo systemctl restart mihomo
 # My port is 7899 here 
 # Create a test script
 
-sudo cat << 'EOF' > /etc/mihomo/test.sh
+cat << 'EOF' > ~/test_dashboard.sh
 #!/bin/bash
 curl -i google.com --proxy http://127.0.0.1:7899
 curl -i youtube.com --proxy http://127.0.0.1:7899
@@ -104,31 +121,34 @@ curl -i baidu.com --proxy http://127.0.0.1:7899
 journalctl -u mihomo | tail
 EOF
 
-cd /etc/mihomo
-sudo chmod +x test.sh  
+chmod +x ~/test_dashboard.sh
 
 # You should see some information of the node you just have selected
-./test.sh &&
-sudo rm /etc/mihomo/test.sh
+bash ~/test_dashboard.sh &&
+rm ~/test_dashboard.sh
 ```
 
 
 ## 3. Neovim  
-> You should know a bit of lua.  
+> 首先运行如下指令  
+```shell
+export http_proxy=http://127.0.0.1:7899 && export https_proxy=$http_proxy
+sudo apt install gcc nodejs
+```
 
 
 ### 3.1 安装 Neovim  
 > [Github home page](https://github.com/neovim/neovim/blob/master/INSTALL.md)  
->> 首先运行 `export http_proxy=http://127.0.0.1:7899 && export https_proxy=$http_proxy`  
->> 安装后运行 `source ~/.bashrc`.  
 ```shell
-#!/bin/bash
-curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz &&
-sudo rm -rf /opt/nvim &&
-sudo tar -C /opt -xzf nvim-linux64.tar.gz &&
+curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz
+sudo rm -rf /opt/nvim
+sudo tar -C /opt -xzf nvim-linux64.tar.gz
+
 cat << 'EOF' >> ~/.bashrc
 export PATH="$PATH:/opt/nvim-linux64/bin"
 EOF
+
+source ~/.bashrc
 ```
 
 
@@ -147,8 +167,14 @@ cp -r ./lua ~/.config/nvim/
 ### 4.1 安装 Yazi  
 > [Official Docs](https://yazi-rs.github.io/docs/installation)  
 ```shell
-# 通过 cargo 安装
-cargo install --locked yazi-fm yazi-cli
+# 通过 Official release 安装
+mkdir yazi && cd yazi
+curl -L https://github.com/sxyazi/yazi/releases/download/v0.3.3/yazi-x86_64-unknown-linux-musl.zip -o yazi.zip
+sudo apt install unzip
+unzip yazi.zip
+cd yazi-x86_64-unknown-linux-musl
+sudo mv ./yazi /usr/bin/
+sudo mv ./ya /usr/bin/
 ```
 
 
@@ -158,6 +184,7 @@ cargo install --locked yazi-fm yazi-cli
 ```shell
 # For bash or zsh
 
+cat << 'EOF' >> ~/.bashrc
 function ra() {
 	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
 	yazi "$@" --cwd-file="$tmp"
@@ -166,6 +193,9 @@ function ra() {
 	fi
 	rm -f -- "$tmp"
 }
+EOF
+
+source ~/.bashrc
 
 # For windows, Create the file ra.cmd and place it in your %PATH%.
 # For Command Prompt
@@ -188,6 +218,11 @@ del "%tmpfile%"
 - `theme.toml`  
 > For Unix-like system, they should be placed at `~/.config/yazi/`  
 > For Windows, `C:\Users\Username\AppData\Roming\yazi\config\` is the right place.  
+
+```
+mkdir ~/.config/yazi -p
+cp ./* ~/.config/yazi/
+```
 
 #### 指定 Neovim 为编辑器  
 > For windows, environment variable `YAZI_FILE_ONE` for file is needed. 
