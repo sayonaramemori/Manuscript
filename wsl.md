@@ -211,7 +211,7 @@ del "%tmpfile%"
 ```
 mkdir ~/.config/yazi -p &&
 cd ~/Manuscript/yazi    &&
-cp ./* ~/.config/yazi/  &&
+cp -r ./* ~/.config/yazi/  &&
 ya pack -a h-hg/yamb    &&
 ya pack -a yazi-rs/plugins:full-border
 ```
@@ -334,3 +334,48 @@ require("full-border"):setup {
 }
 ```
 
+## 5. Oh my zsh  
+
+
+### 5.1 Install zsh  
+```shell
+# 安装 Zsh
+# 将 Zsh 设置为默认 Shell
+sudo apt install -y zsh && chsh -s /bin/zsh
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+```
+
+### 5.2 Config for Neovim and Yazi  
+> **Run** `source ~/.zshrc` after operation  
+```shell
+cat << 'EOF' >> ~/.zshrc 
+export PATH=$PATH:/opt/nvim-linux64/bin
+function ra() {
+    local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+    yazi "$@" --cwd-file="$tmp"
+    if cwd="$(command cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+        builtin cd -- "$cwd"
+    fi
+    rm -f -- "$tmp"
+}
+EOF
+```
+
+### 5.3 UI Configuration  
+> **Run** `source ~/.zshrc` after operation  
+```
+export http_proxy=http://127.0.0.1:7899 && export https_proxy=$http_proxy
+git clone https://github.com/bhilburn/powerlevel9k.git ~/.oh-my-zsh/custom/themes/powerlevel9k
+git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+
+# Remember to remove the original ZSH_THEME and plugins
+
+cat << 'EOF' >> ~/.zshrc
+ZSH_THEME="powerlevel9k/powerlevel9k"
+POWERLEVEL9K_PROMPT_ADD_NEWLINE=true
+plugins=(
+  git zsh-autosuggestions zsh-syntax-highlighting
+)
+EOF
+```
