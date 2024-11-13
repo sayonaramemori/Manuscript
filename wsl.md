@@ -52,10 +52,10 @@ bye
 explorer.exe .
 
 # Back to Linux
-sudo mv ~/Country.mmdb /etc/mihomo/
-sudo mv ~/clash-verge.yaml /etc/mihomo/config.yaml
+sudo mv ~/Country.mmdb /etc/mihomo/ && sudo mv ~/clash-verge.yaml /etc/mihomo/config.yaml
 
-sudo vim /etc/mihompo/config.yaml
+sudo vim /etc/mihomo/config.yaml
+
 # before
 external-controller: 127.0.0.1:9097
 # after
@@ -90,19 +90,13 @@ EOF
 sudo cat /etc/mihomo/config.yaml >> /etc/mihomo/temp.yaml  &&
 sudo mv /etc/mihomo/temp.yaml /etc/mihomo/config.yaml  &&
 sudo mkdir /etc/mihomo/ui -p &&
-sudo systemctl restart mihomo
-```
-
-> Open Dashboard in windows browser  
-```
+sudo systemctl restart mihomo &&
 sudo apt update &&
 sudo apt install net-tools &&
-ifconfig
-
-# Access via http://IP:9097/ui
+ifconfig | grep inet
 ```
 
-> Test whether web-GUI works fine  
+> Test whether web-GUI works fine. Access via http://IP:9097/ui
 ```
 # My port is 7899 here 
 # You should see some information of the node you just have selected
@@ -122,6 +116,8 @@ rm ~/test_dashboard.sh
 
 
 ## 3. Neovim  
+> [Github Page](https://github.com/neovim/neovim/blob/master/INSTALL.md)  
+
 > 首先运行如下指令  
 ```shell
 export http_proxy=http://127.0.0.1:7899 && export https_proxy=$http_proxy
@@ -130,7 +126,8 @@ export http_proxy=http://127.0.0.1:7899 && export https_proxy=$http_proxy
 
 ### 3.1 安装 Neovim  
 > [Github home page](https://github.com/neovim/neovim/blob/master/INSTALL.md)  
-> 安装后执行 `source ~/.bashrc`  
+
+> 安装后 **执行** `source ~/.bashrc`  
 ```shell
 curl -LO --proxy http://127.0.0.1:7899 https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz &&
 sudo rm -rf /opt/nvim  &&
@@ -155,9 +152,10 @@ echo "Done! Using nvim to start editing"
 
 
 ## 4. Yazi  
+> [Official Docs](https://yazi-rs.github.io/docs/installation)  
 
 ### 4.1 安装 Yazi  
-> [Official Docs](https://yazi-rs.github.io/docs/installation)  
+> [Release Page](https://github.com/sxyazi/yazi/releases)  
 ```shell
 # 通过 Official release 安装
 cd ~/Manuscript/yazi &&
@@ -173,7 +171,7 @@ sudo mv ./ya /usr/bin/
 ### 4.2 Shell Wrapper  
 > Provides the ability to change the current working directory when exiting Yazi.
 >> Use `ra` to invoke Yazi.  
->> Run `source ~/.bashrc` after operation  
+>> **Run** `source ~/.bashrc` after operation  
 ```shell
 # For bash or zsh
 
