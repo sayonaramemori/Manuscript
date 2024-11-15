@@ -30,7 +30,6 @@ return {
       lspconfig.jsonls.setup{ capabilities = capabilities, }
       lspconfig.grammarly.setup{ capabilities = capabilities, }
       lspconfig.taplo.setup{ capabilities = capabilities, }
-      lspconfig.gitlab_ci_ls.setup{ capabilities = capabilities, }
     end,
   },
   {
@@ -72,7 +71,6 @@ return {
         "jsonls",
         "grammarly",
         "taplo",
-        "gitlab_ci_ls",
       }
     }
   },

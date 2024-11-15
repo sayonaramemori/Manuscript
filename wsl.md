@@ -228,107 +228,32 @@ edit = [
 ```
 
 ### 4.4 Plugins  
-> [Awesome Plugins](https://yazi-rs.github.io/docs/resources)  
+- [Awesome Plugins](https://yazi-rs.github.io/docs/resources)  
+    1. BookMarks - [yamb.yazi](https://github.com/h-hg/yamb.yazi)  
+    2. Border - [full-border](https://github.com/yazi-rs/plugins/tree/main/full-border.yazi)  
 
+## 5. Oh My Zsh  
 
-#### BookMarks  
-> Use [yamb.yazi](https://github.com/h-hg/yamb.yazi)  
-```shell
-# Install plugin via this cmd
-ya pack -a h-hg/yamb
+### 5.1 Installation  
+```
+sudo apt install zsh
+sh -c "$(wget -O- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 ```
 
-```lua
--- create init.lua to the directory holds yazi.toml and add this below
--- You can configure your bookmarks by lua language
-local bookmarks = {}
-
-local path_sep = package.config:sub(1, 1)
-local home_path = ya.target_family() == "windows" and os.getenv("USERPROFILE") or os.getenv("HOME")
-if ya.target_family() == "windows" then
-  table.insert(bookmarks, {
-    tag = "Scoop Local",
-    
-    path = (os.getenv("SCOOP") or home_path .. "\\scoop") .. "\\",
-    key = "p"
-  })
-  table.insert(bookmarks, {
-    tag = "Scoop Global",
-    path = (os.getenv("SCOOP_GLOBAL") or "C:\\ProgramData\\scoop") .. "\\",
-    key = "P"
-  })
-end
-table.insert(bookmarks, {
-  tag = "Desktop",
-  path = home_path .. path_sep .. "Desktop" .. path_sep,
-  key = "d"
-})
-
-require("yamb"):setup {
-  -- Optional, the path ending with path seperator represents folder.
-  bookmarks = bookmarks,
-  -- Optional, recieve notification everytime you jump.
-  jump_notify = true,
-  -- Optional, the cli of fzf.
-  cli = "fzf",
-  -- Optional, a string used for randomly generating keys, where the preceding characters have higher priority.
-  keys = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
-  -- Optional, the path of bookmarks
-  path = (ya.target_family() == "windows" and os.getenv("APPDATA") .. "\\yazi\\config\\bookmark") or
-        (os.getenv("HOME") .. "/.config/yazi/bookmark"),
-}
-
+### 5.2 Configuration  
+> Plugin Installation  
 ```
-Add this to your `keymap.toml`  
-```toml
-[[manager.prepend_keymap]]
-on = [ "b", "a" ]
-run = "plugin yamb --args=save"
-desc = "Add bookmark"
-
-[[manager.prepend_keymap]]
-on = [ "b", "g" ]
-run = "plugin yamb --args=jump_by_key"
-desc = "Jump bookmark by key"
-
-[[manager.prepend_keymap]]
-on = [ "b", "G" ]
-run = "plugin yamb --args=jump_by_fzf"
-desc = "Jump bookmark by fzf"
-
-[[manager.prepend_keymap]]
-on = [ "b", "d" ]
-run = "plugin yamb --args=delete_by_key"
-desc = "Delete bookmark by key"
-
-[[manager.prepend_keymap]]
-on = [ "b", "D" ]
-run = "plugin yamb --args=delete_by_fzf"
-desc = "Delete bookmark by fzf"
-
-[[manager.prepend_keymap]]
-on = [ "b", "A" ]
-run = "plugin yamb --args=delete_all"
-desc = "Delete all bookmarks"
-
-[[manager.prepend_keymap]]
-on = [ "b", "r" ]
-run = "plugin yamb --args=rename_by_key"
-desc = "Rename bookmark by key"
-
-[[manager.prepend_keymap]]
-on = [ "b", "R" ]
-run = "plugin yamb --args=rename_by_fzf"
-desc = "Rename bookmark by fzf"
+git clone https://github.com/bhilburn/powerlevel9k.git ~/.oh-my-zsh/custom/themes/powerlevel9k
+git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
+```
+> Modify your `.zshrc`, be careful of the order  
+```
+plugins=(
+  git zsh-autosuggestions zsh-syntax-highlighting copypath
+)
+ZSH_THEME="powerlevel10k/powerlevel10k"
 ```
 
-#### Full Border  
-```shell
-ya pack -a yazi-rs/plugins:full-border
 
-# Copu to your init.lua  
-require("full-border"):setup {
-	-- Available values: ui.Border.PLAIN, ui.Border.ROUNDED
-	type = ui.Border.ROUNDED,
-}
-```
