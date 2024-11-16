@@ -4,7 +4,7 @@ return {
     opts = {
         -- size can be a number or function which is passed the current terminal
         size = 20, 
-        open_mapping = [[<c-t>]], -- or { [[<c-\>]], [[<c-¥>]] } if you also use a Japanese keyboard.
+        open_mapping = '<leader>t',-- or { [[<c-\>]], [[<c-¥>]] } if you also use a Japanese keyboard.
         direction = 'float',
         shade_terminals = true,
         close_on_exit = true,
