@@ -23,15 +23,8 @@ wsl --import <Distro> <InstallLocation> <FileName>
 3. 依个人喜好设置 **配色方案** ，**背景图像** 和 **透明度** 等
 
 ### 1.4 Ubuntu Prerequisite  
-- [Nodejs](https://nodejs.org/en/download/package-manager)  
-- [Cmake](https://cmake.org/download/)  
-- [Anaconda](https://repo.anaconda.com/archive/)
 ```
 sudo apt update && sudo apt install -y net-tools gcc g++ unzip make
-
-conda create --name my_env python=3.8.20
-
-conda create --name <new_env_name> --clone <existing_env_name>
 ```
 
 ## 2. Mihomo  
@@ -46,13 +39,14 @@ conda create --name <new_env_name> --clone <existing_env_name>
 ```shell
 # Using Github proxy ,here is https://ghp.ci
 # My cpu architecture is x86_64. Choose your version.
+# Please check whether the Github Proxy is still accessible.
 
 curl -L https://ghp.ci/https://github.com/MetaCubeX/mihomo/releases/download/v1.18.10/mihomo-linux-amd64-compatible-go120-v1.18.10.deb -o mihomo.deb  &&
 sudo apt install ./mihomo.deb
 ```
 2. 在 Windows 中打开配置目录，复制 `clash-verge.yaml` and `Country.mmdb` 到 `/etc/mihomo`  
 ```shell
-# You could choose other elegant way to achieve file transfermation.
+# You could choose other elegant way to achieve file transfering.
 # For cloud-server, I use sftp here
 # cd [YOUR_WINDOWS_CONFIG_DIR]
 sftp user@host
@@ -75,8 +69,10 @@ external-controller: 0.0.0.0:9097
 3. Do Test  
 ```
 # Port is set in config.yaml with configuration item -- port.
+# In this example, port is 7899.
 
-sudo systemctl start mihomo &&
+sudo systemctl start mihomo
+
 curl -i google.com --proxy http://127.0.0.1:7899
 
 # If failing, try below and inspect the log
@@ -90,6 +86,7 @@ curl -i google.com --proxy http://127.0.0.1:7899
 # Insert the three lines into config.yaml
 # Access via http://{{external-controller}}/ui in browser
 # The IP of your host is needed for accessment.
+# Add port 9097 to your security-group if you are using cloud-server and check your fire-wall
 # Do remember set secret for security.
 
 sudo cat << 'EOF' > /etc/mihomo/temp.yaml
@@ -127,7 +124,8 @@ rm ~/test_dashboard.sh
 
 
 ## 3. Neovim  
-> [Github Page](https://github.com/neovim/neovim/blob/master/INSTALL.md)  
+- [Github Page](https://github.com/neovim/neovim/blob/master/INSTALL.md)  
+- Plugin Markdown-Preview Needs [Nodejs](https://nodejs.org/en/download/package-manager)  
 
 > 首先运行如下指令  
 ```shell
@@ -136,14 +134,12 @@ export http_proxy=http://127.0.0.1:7899 && export https_proxy=$http_proxy
 
 
 ### 3.1 安装 Neovim  
-> [Github home page](https://github.com/neovim/neovim/blob/master/INSTALL.md)  
-
-> 安装后 **执行** `echo 'export PATH=$PATH:/opt/nvim-linux64/bin' >> ~/.bashrc && source ~/.bashrc`  
-> 或者 **执行** `sudo ln -s /opt/nvim-linux64/bin/nvim /usr/bin/nvim`
 ```shell
 curl -LO --proxy http://127.0.0.1:7899 https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz &&
 sudo rm -rf /opt/nvim  &&
-sudo tar -C /opt -xzf nvim-linux64.tar.gz
+sudo tar -C /opt -xzf nvim-linux64.tar.gz &&
+sudo ln -s /opt/nvim-linux64/bin/nvim /usr/bin/nvim &&
+sudo rm -rf ./nvim-linux64.tar.gz -
 ```
 
 ### 3.2 配置 Neovim  
@@ -159,10 +155,10 @@ echo "Done! Using nvim to start editing"
 ```
 
 ## 4. Yazi  
-> [Official Docs](https://yazi-rs.github.io/docs/installation)  
+- [Official Docs](https://yazi-rs.github.io/docs/installation)  
+- [Release Page](https://github.com/sxyazi/yazi/releases)  
 
 ### 4.1 安装 Yazi  
-> [Release Page](https://github.com/sxyazi/yazi/releases)  
 ```shell
 # 通过 Official release 安装
 curl -L --proxy http://127.0.0.1:7899 https://github.com/sxyazi/yazi/releases/download/v0.3.3/yazi-x86_64-unknown-linux-musl.zip -o yazi.zip  &&
@@ -174,13 +170,12 @@ sudo mv ./ya /usr/bin/
 
 
 ### 4.2 Shell Wrapper  
-> Provides the ability to change the current working directory when exiting Yazi.
->> Use `ra` to invoke Yazi.  
->> **Run** `source ~/.bashrc` after operation  
-```shell
-# For bash or zsh
+> Provides the ability to change the current working directory when exiting Yazi.  
 
-cat << 'EOF' >> ~/.bashrc
+-  Use `ra` to invoke Yazi.  
+-  **Run** `. ~/.profile` after operation  
+```shell
+cat << 'EOF' >> ~/.profile
 function ra() {
 	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
 	yazi "$@" --cwd-file="$tmp"
@@ -191,6 +186,7 @@ function ra() {
 }
 EOF
 ```
+
 ```cmd
 # For windows, Create the file ra.cmd and place it in your %PATH%.
 # For Command Prompt
@@ -207,12 +203,10 @@ del "%tmpfile%"
 
 
 ### 4.3 Configuration  
-> There are three configuration files for Yazi.  
-- `yazi.toml`  
-- `keymap.toml`  
-- `theme.toml`  
-> For Unix-like system, they should be placed at `~/.config/yazi/`  
-> For Windows, `C:\Users\Username\AppData\Roming\yazi\config\` is the right place.  
+> 这里套用个人配置，详细配置可前往[官网](https://yazi-rs.github.io/docs/installation)查看  
+
+- For Unix-like system, they should be placed at `~/.config/yazi/`  
+- For Windows, `C:\Users\Username\AppData\Roming\yazi\config\` is the right place.  
 
 ```
 mkdir ~/.config/yazi -p &&
@@ -222,16 +216,12 @@ ya pack -a h-hg/yamb    &&
 ya pack -a yazi-rs/plugins:full-border
 ```
 
-#### 指定 Neovim 为编辑器  
-> For windows, environment variable `YAZI_FILE_ONE` for file is needed. 
->> For example `YAZI_FILE_ONE=C:\Program Files\Git\usr\bin\file.exe`  
+> 指定 Neovim 为编辑器  
+- For windows, environment variable `YAZI_FILE_ONE` for file is needed. 
+- For example `YAZI_FILE_ONE=C:\Program Files\Git\usr\bin\file.exe`  
 ```toml
-# In yazi.toml  
-
 [opener]
-edit = [
-	{ run = "nvim %*",  block = true, desc = "nvim", for = "windows" },
-]
+edit = [ { run = "nvim %*",  block = true, desc = "nvim", for = "windows" }, ]
 ```
 
 ### 4.4 Plugins  
@@ -255,12 +245,16 @@ git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-m
 git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
 ```
+
 > Modify your `.zshrc`, be careful of the order  
 ```
 plugins=(
   git zsh-autosuggestions zsh-syntax-highlighting copypath
 )
 ZSH_THEME="powerlevel10k/powerlevel10k"
+
+# For yazi
+. ~/.profile
 ```
 
 
