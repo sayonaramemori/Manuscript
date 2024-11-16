@@ -23,8 +23,15 @@ wsl --import <Distro> <InstallLocation> <FileName>
 3. 依个人喜好设置 **配色方案** ，**背景图像** 和 **透明度** 等
 
 ### 1.4 Ubuntu Prerequisite  
+- [Nodejs](https://nodejs.org/en/download/package-manager)  
+- [Cmake](https://cmake.org/download/)  
+- [Anaconda](https://repo.anaconda.com/archive/)
 ```
-sudo apt update && sudo apt install -y net-tools gcc unzip 
+sudo apt update && sudo apt install -y net-tools gcc g++ unzip make
+
+conda create --name my_env python=3.8.20
+
+conda create --name <new_env_name> --clone <existing_env_name>
 ```
 
 ## 2. Mihomo  
@@ -132,6 +139,7 @@ export http_proxy=http://127.0.0.1:7899 && export https_proxy=$http_proxy
 > [Github home page](https://github.com/neovim/neovim/blob/master/INSTALL.md)  
 
 > 安装后 **执行** `echo 'export PATH=$PATH:/opt/nvim-linux64/bin' >> ~/.bashrc && source ~/.bashrc`  
+> 或者 **执行** `sudo ln -s /opt/nvim-linux64/bin/nvim /usr/bin/nvim`
 ```shell
 curl -LO --proxy http://127.0.0.1:7899 https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz &&
 sudo rm -rf /opt/nvim  &&
@@ -149,7 +157,6 @@ cp ./init.lua ~/.config/nvim/init.lua &&
 cp -r ./lua ~/.config/nvim/ &&
 echo "Done! Using nvim to start editing"
 ```
-
 
 ## 4. Yazi  
 > [Official Docs](https://yazi-rs.github.io/docs/installation)  
