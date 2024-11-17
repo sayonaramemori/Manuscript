@@ -24,7 +24,7 @@ wsl --import <Distro> <InstallLocation> <FileName>
 
 ### 1.4 Ubuntu Prerequisite  
 ```
-sudo apt update && sudo apt install -y net-tools gcc g++ unzip make
+sudo apt update && sudo apt install -y net-tools gcc g++ unzip make python3.10-venv
 ```
 
 ## 2. Mihomo  
