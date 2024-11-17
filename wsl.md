@@ -24,7 +24,9 @@ wsl --import <Distro> <InstallLocation> <FileName>
 
 ### 1.4 Ubuntu Prerequisite  
 ```
-sudo apt update && sudo apt install -y net-tools gcc g++ unzip make python3.10-venv
+sudo apt update && sudo apt install -y net-tools gcc g++ unzip make
+
+sudo apt search '^python3.[0-9]+.*-venv$'
 ```
 
 ## 2. Mihomo  
@@ -330,6 +332,8 @@ echo \
 ### 6.4 安装 Anaconda  
 - Select your version from the [Distribution Page](https://repo.anaconda.com/archive/).  
 
+### 6.5 安装 rust
+- `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`  
 
 
 
