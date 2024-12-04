@@ -21,7 +21,16 @@ return {
         end,
         single_file_support = true,
       }
-      lspconfig.pyright.setup{ capabilities = capabilities, }
+      lspconfig.pyright.setup{
+        capabilities = capabilities, 
+        root_dir = util.root_pattern(
+        'pyproject.toml',
+        'setup.py',
+        'setup.cfg',
+        'requirements.txt',
+        '.git'
+        ) or util.path.dirname,
+      }
       lspconfig.rust_analyzer.setup{ capabilities = capabilities, }
       lspconfig.lua_ls.setup{ capabilities = capabilities, }
       lspconfig.volar.setup{ capabilities = capabilities, }

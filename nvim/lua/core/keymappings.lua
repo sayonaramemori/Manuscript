@@ -87,4 +87,6 @@ vim.keymap.set("n", "[", "0")
 vim.keymap.set("n", "s", ":w<cr>")
 vim.keymap.set("n", "]", "$")
 vim.keymap.set("n", "K", "i<cr><Esc>")
+vim.keymap.set("n", "<leader>b", ":checkhealth lsp<cr>")
+
 

@@ -10,5 +10,4 @@ vim.opt.termguicolors = true
 require("core.keymappings")
 require("core.lazy")
 
-
-
+vim.keymap.set("n","g<leader>","viw:Translate ZH<CR>")

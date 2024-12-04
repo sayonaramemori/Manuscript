@@ -15,6 +15,9 @@ return {
                 text_align = "center",
                 separator = true
             }},
+            separator_style = "slant",
+            diagnostics = "nvim_lsp",
+
         }
     }
 }
