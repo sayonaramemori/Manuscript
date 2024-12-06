@@ -1,5 +1,4 @@
 ## 1. WSL Basics and UI configuration  
-# Configuration for repository 1
 
 ### 1.1 WSL 常用操作  
 ```shell
@@ -70,7 +69,7 @@ external-controller: 0.0.0.0:9097
 wget https://ghp.ci/https://github.com/sayonaramemori/Manuscript/blob/main/config.yaml &&
 sudo cp ./config.yaml /etc/mihomo/config.yaml
 
-wget https://ghp.ci/https://github.com/mikefarah/yq/releases/download/v4.44.5/yq_linux_amd64 -o yq &&
+wget https://ghp.ci/https://github.com/mikefarah/yq/releases/download/v4.44.5/yq_linux_amd64 -O yq &&
 sudo chmod +x yq &&
 sudo mv yq /usr/bin/yq
 
