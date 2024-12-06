@@ -76,7 +76,7 @@ sudo mv yq /usr/bin/yq
 
 sudo systemctl start mihomo
 cd /etc/mihomo/
-yq ea '. as $item ireduce ({}; . * $item )' config.yaml ./proxies/TARGET > config.yaml
+yq ea '. as $item ireduce ({}; . * $item )' ./proxies/TARGET config.yaml > config.yaml
 sudo systemctl restart mihomo
 ```
 
