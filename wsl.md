@@ -55,7 +55,9 @@ sudo apt install ./mihomo.deb
 explorer.exe .
 
 # Back to Linux
-sudo mv ~/Country.mmdb /etc/mihomo/ && sudo mv ~/clash-verge.yaml /etc/mihomo/config.yaml  && sudo vim /etc/mihomo/config.yaml
+sudo mv ~/Country.mmdb /etc/mihomo/ && 
+sudo mv ~/clash-verge.yaml /etc/mihomo/config.yaml  && 
+sudo vim /etc/mihomo/config.yaml
 
 # before
 external-controller: 127.0.0.1:9097
@@ -64,10 +66,21 @@ external-controller: 0.0.0.0:9097
 ```
 2. 方式二：复制基础配置`config.yaml`，并将订阅链接填入  
 ```shell
-git clone 
+# Download the base config
+wget https://ghp.ci/https://github.com/sayonaramemori/Manuscript/blob/main/config.yaml &&
+sudo cp ./config.yaml /etc/mihomo/config.yaml
+
+wget https://ghp.ci/https://github.com/mikefarah/yq/releases/download/v4.44.5/yq_linux_amd64 -o yq &&
+sudo chmod +x yq &&
+sudo mv yq /usr/bin/yq
+
+sudo systemctl start mihomo
+cd /etc/mihomo/
+yq ea '. as $item ireduce ({}; . * $item )' config.yaml ./proxies/TARGET > config.yaml
+sudo systemctl restart mihomo
 ```
 
-3. Do Test  
+#### 2.1.3 Do Test  
 ```
 # Port is set in config.yaml with configuration item -- port. In this example, port is 7899
 
@@ -80,7 +93,7 @@ journalctl -u mihomo | tail
 ```
 
 ### 2.2 配置 Web 仪表盘  
-> To select node freely with Web-GUI.  
+> 只有方案一需要配置，方案二已自动配置  
 ```shell
 # Caution: Github proxy also used here
 # Insert the three lines into config.yaml
