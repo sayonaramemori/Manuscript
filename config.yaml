@@ -34,6 +34,7 @@ port: 7899
 allow-lan: true
 log-level: info
 unified-delay: true
+
 tun:
   enable: false
   stack: gvisor
@@ -42,8 +43,10 @@ tun:
   auto-detect-interface: true
   dns-hijack:
   - any:53
+
 profile:
   store-selected: true
+
 dns:
   use-system-hosts: false
   enable: true

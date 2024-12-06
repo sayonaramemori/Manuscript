@@ -3,7 +3,7 @@
 
 ### 1.1 WSL 常用操作  
 ```shell
-wsl -l -v                 # 列出已安装的Linux发行版及其状态
+sl -l -v                 # 列出已安装的Linux发行版及其状态
 wsl -t <Distro>           # 停止指定的Linux发行版
 wsl --unregister <Distro> # 移除指定的Linux发行版
 
@@ -38,7 +38,9 @@ sudo apt search '^python3.[0-9]+.*-venv$'
 
 
 ### 2.1 安装和配置  
-1. Download the installer, with [Github Proxy](https://ghp.ci/).  
+
+#### 2.1.1 Installation  
+- Download the installer, with [Github Proxy](https://ghp.ci/).  
 ```shell
 # Using Github proxy ,here is https://ghp.ci
 # Please check whether the Github Proxy is still accessible.
@@ -46,7 +48,8 @@ sudo apt search '^python3.[0-9]+.*-venv$'
 curl -L https://ghp.ci/https://github.com/MetaCubeX/mihomo/releases/download/v1.18.10/mihomo-linux-amd64-compatible-go120-v1.18.10.deb -o mihomo.deb  &&
 sudo apt install ./mihomo.deb
 ```
-2. 在 Windows 中打开配置目录，复制 `clash-verge.yaml` and `Country.mmdb` 到 `/etc/mihomo`  
+#### 2.1.2 Configuration  
+1. 方式一：Windows 中打开配置目录，复制 `clash-verge.yaml` and `Country.mmdb` 到 `/etc/mihomo`  
 ```shell
 # For wsl, just manually copy them
 explorer.exe .
@@ -58,6 +61,10 @@ sudo mv ~/Country.mmdb /etc/mihomo/ && sudo mv ~/clash-verge.yaml /etc/mihomo/co
 external-controller: 127.0.0.1:9097
 # after
 external-controller: 0.0.0.0:9097
+```
+2. 方式二：复制基础配置`config.yaml`，并将订阅链接填入  
+```shell
+git clone 
 ```
 
 3. Do Test  
