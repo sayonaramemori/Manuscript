@@ -1,4 +1,5 @@
 ## 1. WSL Basics and UI configuration  
+# Configuration for repository 1
 
 ### 1.1 WSL 常用操作  
 ```shell
@@ -40,7 +41,6 @@ sudo apt search '^python3.[0-9]+.*-venv$'
 1. Download the installer, with [Github Proxy](https://ghp.ci/).  
 ```shell
 # Using Github proxy ,here is https://ghp.ci
-# My cpu architecture is x86_64. Choose your version.
 # Please check whether the Github Proxy is still accessible.
 
 curl -L https://ghp.ci/https://github.com/MetaCubeX/mihomo/releases/download/v1.18.10/mihomo-linux-amd64-compatible-go120-v1.18.10.deb -o mihomo.deb  &&
@@ -48,14 +48,6 @@ sudo apt install ./mihomo.deb
 ```
 2. 在 Windows 中打开配置目录，复制 `clash-verge.yaml` and `Country.mmdb` 到 `/etc/mihomo`  
 ```shell
-# You could choose other elegant way to achieve file transfering.
-# For cloud-server, I use sftp here
-# cd [YOUR_WINDOWS_CONFIG_DIR]
-sftp user@host
-put clash-verge.yaml
-put Country.mmdb
-bye
-
 # For wsl, just manually copy them
 explorer.exe .
 
@@ -70,15 +62,14 @@ external-controller: 0.0.0.0:9097
 
 3. Do Test  
 ```
-# Port is set in config.yaml with configuration item -- port.
-# In this example, port is 7899.
+# Port is set in config.yaml with configuration item -- port. In this example, port is 7899
 
 sudo systemctl start mihomo
-
+sleep 1
 curl -i google.com --proxy http://127.0.0.1:7899
 
 # If failing, try below and inspect the log
-# journalctl -u mihomo
+journalctl -u mihomo | tail
 ```
 
 ### 2.2 配置 Web 仪表盘  
@@ -92,10 +83,27 @@ curl -i google.com --proxy http://127.0.0.1:7899
 # Do remember set secret for security.
 
 sudo cat << 'EOF' > /etc/mihomo/temp.yaml
+proxy-providers:
+  kuajing:
+    type: http
+    interval: 1800
+    proxy: DIRECT
+    url: "[YOU_SUBSCRIPTION_URL]"
+global-ua: clash.meta
+geodata-mode: false
+geodate-loader: standard
+geo-auto-update: true
+geo-update-interval: 48
+geox-url:
+  geosite: "https://mirror.ghproxy.com/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geosite.dat"
+  mmdb: "https://mirror.ghproxy.com/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip-lite.metadb"
+  geoip: "https://mirror.ghproxy.com/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip-lite.dat"
+  asn: "https://mirror.ghproxy.com/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/GeoLite2-ASN.mmdb"
 external-ui: /etc/mihomo/ui
 external-ui-name: my-ui
 external-ui-url: "https://ghp.ci/https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip"
 EOF
+
 sudo cat /etc/mihomo/config.yaml >> /etc/mihomo/temp.yaml  &&
 sudo mv /etc/mihomo/temp.yaml /etc/mihomo/config.yaml  &&
 sudo mkdir /etc/mihomo/ui -p &&
@@ -106,19 +114,12 @@ echo "DashBoard-Url: http://${ip}:9097/ui"
 
 > Test whether web-GUI works fine. Access via http://IP:9097/ui
 ```
-# My port is 7899 here 
-# You should see some information of the node you just have selected
-
-clear
-
 cat << 'EOF' > ~/test_dashboard.sh
 #!/bin/bash
 curl -i google.com --proxy http://127.0.0.1:7899
 curl -i youtube.com --proxy http://127.0.0.1:7899
-curl -i baidu.com --proxy http://127.0.0.1:7899
-journalctl -u mihomo | tail -n 3
+journalctl -u mihomo | tail -n 2
 EOF
-
 chmod +x ~/test_dashboard.sh &&
 bash ~/test_dashboard.sh &&
 rm ~/test_dashboard.sh
@@ -145,8 +146,9 @@ sudo rm -rf ./nvim-linux64.tar.gz -
 ```
 
 ### 3.2 配置 Neovim  
-> 这里套用个人配置，可自行搜索Neovim相关配置 :D  
->> 推荐配置： [LunarVim](https://github.com/LunarVim/LunarVim)  
+- 这里套用个人配置，可自行搜索Neovim相关配置 :D  
+- 推荐配置： [LunarVim](https://github.com/LunarVim/LunarVim)  
+- Create link for root : `sudo mkdir /root/.config -p && sudo ln -s /home/{USER_NAME}/.config/nvim /root/.config/nvim`
 ```
 git clone https://github.com/sayonaramemori/Manuscript.git  &&
 cd Manuscript && cd nvim &&

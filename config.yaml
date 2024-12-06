@@ -1,0 +1,52 @@
+secret: ''
+external-ui: /etc/mihomo/ui
+external-ui-name: my-ui
+external-ui-url: "https://ghp.ci/https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip"
+external-controller: 0.0.0.0:9097
+external-controller-cors:
+  allow-private-network: true
+  allow-origins:
+  - '*'
+
+proxy-providers:
+  kuajing:
+    type: http
+    interval: 1800
+    proxy: DIRECT
+    url: ""
+
+global-ua: clash.meta
+geodata-mode: false
+geodate-loader: standard
+geo-auto-update: true
+geo-update-interval: 48
+geox-url:
+  geosite: "https://mirror.ghproxy.com/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geosite.dat"
+  mmdb: "https://mirror.ghproxy.com/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip-lite.metadb"
+  geoip: "https://mirror.ghproxy.com/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip-lite.dat"
+  asn: "https://mirror.ghproxy.com/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/GeoLite2-ASN.mmdb"
+
+mode: rule
+redir-port: 7892
+mixed-port: 7897
+socks-port: 7898
+port: 7899
+allow-lan: true
+log-level: info
+unified-delay: true
+tun:
+  enable: false
+  stack: gvisor
+  auto-route: true
+  strict-route: false
+  auto-detect-interface: true
+  dns-hijack:
+  - any:53
+profile:
+  store-selected: true
+dns:
+  use-system-hosts: false
+  enable: true
+  ipv6: false
+  enhanced-mode: redir-host
+  fake-ip-range: 198.18.0.1/16
