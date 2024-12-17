@@ -39,7 +39,7 @@ sudo apt search '^python3.[0-9]+.*-venv$'
 ### 2.1 安装和配置  
 
 #### 2.1.1 Installation  
-- Run this cmd first: `export GITHUB_PROXY=https://mirror.ghproxy.com`
+- Run this cmd first: `export GITHUB_PROXY=https://gh-proxy.com`
 
 ```shell
 # Please check whether the Github Proxy is still accessible.
@@ -62,8 +62,8 @@ sudo chmod +x yq &&
 sudo mv yq /usr/bin/yq
 
 # Download the base config
-wget $GITHUB_PROXY/https://github.com/sayonaramemori/Manuscript/blob/main/config.yaml -O config.yaml &&
-yq -i '.proxy-providers.one.url = strenv(SUBURL)' ./config.yaml
+wget $GITHUB_PROXY/https://github.com/sayonaramemori/Manuscript/blob/main/config_base.yaml -O config.yaml &&
+yq -i '.proxy-providers.one.url = strenv(SUB_URL)' ./config.yaml
 
 sudo mkdir /etc/mihomo/ -p &&
 cat ./config.yaml | sudo tee /etc/mihomo/temp.yaml > /dev/null &&
