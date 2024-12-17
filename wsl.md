@@ -2,7 +2,7 @@
 
 ### 1.1 WSL 常用操作  
 ```shell
-sl -l -v                 # 列出已安装的Linux发行版及其状态
+wsl -l -v                 # 列出已安装的Linux发行版及其状态
 wsl -t <Distro>           # 停止指定的Linux发行版
 wsl --unregister <Distro> # 移除指定的Linux发行版
 
@@ -39,16 +39,42 @@ sudo apt search '^python3.[0-9]+.*-venv$'
 ### 2.1 安装和配置  
 
 #### 2.1.1 Installation  
-- Download the installer, with [Github Proxy](https://ghp.ci/).  
+- Run this cmd first: `export GITHUB_PROXY=https://mirror.ghproxy.com`
+
 ```shell
-# Using Github proxy ,here is https://ghp.ci
 # Please check whether the Github Proxy is still accessible.
 
-curl -L https://ghp.ci/https://github.com/MetaCubeX/mihomo/releases/download/v1.18.10/mihomo-linux-amd64-compatible-go120-v1.18.10.deb -o mihomo.deb  &&
+curl -L $GITHUB_PROXY/https://github.com/MetaCubeX/mihomo/releases/download/v1.18.10/mihomo-linux-amd64-compatible-go120-v1.18.10.deb -o mihomo.deb  &&
 sudo apt install ./mihomo.deb
+
+# Remove mihomo
+# sudo systemctl stop mihomo && sudo rm /etc/mihomo -rf && sudo apt remove mihomo && sudo apt autoremove
 ```
 #### 2.1.2 Configuration  
-1. 方式一：Windows 中打开配置目录，复制 `clash-verge.yaml` and `Country.mmdb` 到 `/etc/mihomo`  
+1. 方式一: 下载基础配置`config.yaml` 并导出订阅链接环境变量: `export SUB_URL=[YOUR_SUB_URL]`
+```shell
+#!/bin/bash
+echo "You Github proxy is $GITHUB_PROXY"
+
+# Downlaod yq for yaml operation
+wget $GITHUB_PROXY/https://github.com/mikefarah/yq/releases/download/v4.44.5/yq_linux_amd64 -O yq &&
+sudo chmod +x yq &&
+sudo mv yq /usr/bin/yq
+
+# Download the base config
+wget $GITHUB_PROXY/https://github.com/sayonaramemori/Manuscript/blob/main/config.yaml -O config.yaml &&
+yq -i '.proxy-providers.one.url = strenv(SUBURL)' ./config.yaml
+
+sudo mkdir /etc/mihomo/ -p &&
+cat ./config.yaml | sudo tee /etc/mihomo/temp.yaml > /dev/null &&
+sudo cp /etc/mihomo/temp.yaml /etc/mihomo/config.yaml &&
+sudo systemctl restart mihomo &&
+sleep 2 &&
+cd /etc/mihomo/ &&
+yq ea '. as $item ireduce ({}; . * $item )' "/etc/mihomo/proxies/"`sudo ls /etc/mihomo/proxies` temp.yaml | sudo tee config.yaml > /dev/null &&
+sudo systemctl restart mihomo
+```
+2. 方式二：Windows 中打开配置目录，复制 `clash-verge.yaml` and `Country.mmdb` 到 `/etc/mihomo`  
 ```shell
 # For wsl, just manually copy them
 explorer.exe .
@@ -56,68 +82,8 @@ explorer.exe .
 # Back to Linux
 sudo mv ~/Country.mmdb /etc/mihomo/ && 
 sudo mv ~/clash-verge.yaml /etc/mihomo/config.yaml  && 
-sudo vim /etc/mihomo/config.yaml
-
-# before
-external-controller: 127.0.0.1:9097
-# after
-external-controller: 0.0.0.0:9097
-```
-2. 方式二：复制基础配置`config.yaml`，并将订阅链接填入  
-```shell
-# Download the base config
-wget https://ghp.ci/https://github.com/sayonaramemori/Manuscript/blob/main/config.yaml &&
-sudo cp ./config.yaml /etc/mihomo/config.yaml
-
-wget https://ghp.ci/https://github.com/mikefarah/yq/releases/download/v4.44.5/yq_linux_amd64 -O yq &&
-sudo chmod +x yq &&
-sudo mv yq /usr/bin/yq
-
-sudo systemctl start mihomo
-cd /etc/mihomo/
-yq ea '. as $item ireduce ({}; . * $item )' ./proxies/TARGET config.yaml > config.yaml
-sudo systemctl restart mihomo
-```
-
-#### 2.1.3 Do Test  
-```
-# Port is set in config.yaml with configuration item -- port. In this example, port is 7899
-
-sudo systemctl start mihomo
-sleep 1
-curl -i google.com --proxy http://127.0.0.1:7899
-
-# If failing, try below and inspect the log
-journalctl -u mihomo | tail
-```
-
-### 2.2 配置 Web 仪表盘  
-> 只有方案一需要配置，方案二已自动配置  
-```shell
-# Caution: Github proxy also used here
-# Insert the three lines into config.yaml
-# Access via http://{{external-controller}}/ui in browser
-# The IP of your host is needed for accessment.
-# Add port 9097 to your security-group if you are using cloud-server and check your fire-wall
-# Do remember set secret for security.
 
 sudo cat << 'EOF' > /etc/mihomo/temp.yaml
-proxy-providers:
-  kuajing:
-    type: http
-    interval: 1800
-    proxy: DIRECT
-    url: "[YOU_SUBSCRIPTION_URL]"
-global-ua: clash.meta
-geodata-mode: false
-geodate-loader: standard
-geo-auto-update: true
-geo-update-interval: 48
-geox-url:
-  geosite: "https://mirror.ghproxy.com/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geosite.dat"
-  mmdb: "https://mirror.ghproxy.com/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip-lite.metadb"
-  geoip: "https://mirror.ghproxy.com/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip-lite.dat"
-  asn: "https://mirror.ghproxy.com/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/GeoLite2-ASN.mmdb"
 external-ui: /etc/mihomo/ui
 external-ui-name: my-ui
 external-ui-url: "https://ghp.ci/https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip"
@@ -131,6 +97,16 @@ ip=`ifconfig | grep inet | grep -v 127.0.0.1 | grep -v inet6 | awk '{print$2}'`
 echo "DashBoard-Url: http://${ip}:9097/ui"
 ```
 
+
+### 2.2 Do Test  
+```
+# Port is set in config.yaml with configuration item -- port. In this example, port is 7899
+
+curl -i google.com --proxy http://127.0.0.1:7899
+
+# If failing, try below and inspect the log
+journalctl -u mihomo | tail
+```
 > Test whether web-GUI works fine. Access via http://IP:9097/ui
 ```
 cat << 'EOF' > ~/test_dashboard.sh
@@ -143,7 +119,6 @@ chmod +x ~/test_dashboard.sh &&
 bash ~/test_dashboard.sh &&
 rm ~/test_dashboard.sh
 ```
-
 
 ## 3. Neovim  
 - [Github Page](https://github.com/neovim/neovim/blob/master/INSTALL.md)  
