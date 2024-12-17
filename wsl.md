@@ -56,7 +56,7 @@ sudo apt install ./mihomo.deb
 #!/bin/bash
 if [ -z $SUB_URL ]; then
     echo "Please export SUB_URL first. Stop Running"
-    return
+    exit 0
 fi
 echo "You Github proxy is $GITHUB_PROXY"
 
