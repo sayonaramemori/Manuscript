@@ -54,6 +54,10 @@ sudo apt install ./mihomo.deb
 1. 方式一: 下载基础配置`config.yaml` 并导出订阅链接环境变量: `export SUB_URL=[YOUR_SUB_URL]`
 ```shell
 #!/bin/bash
+if [ -z $SUB_URL ]; then
+    echo "Please export SUB_URL first. Stop Running"
+    return
+fi
 echo "You Github proxy is $GITHUB_PROXY"
 
 # Downlaod yq for yaml operation
