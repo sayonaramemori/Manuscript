@@ -66,7 +66,7 @@ sudo chmod +x yq &&
 sudo mv yq /usr/bin/yq
 
 # Download the base config
-wget $GITHUB_PROXY/https://github.com/sayonaramemori/Manuscript/blob/main/config_base.yaml -O config.yaml &&
+wget $GITHUB_PROXY/https://github.com/sayonaramemori/Manuscript/blob/main/config.yaml -O config.yaml &&
 chmod 666 ./config.yaml &&
 sed -i -e "s|PROXYPLACEHOLDER|$GITHUB_PROXY|g" ./config.yaml
 yq -i '.proxy-providers.one.url = strenv(SUB_URL)' ./config.yaml
