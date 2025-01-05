@@ -10,5 +10,7 @@ return {
                 },
             },
         })
+        -- Hello World
+        vim.keymap.set("n","g<leader>",":Translate zh-CN<CR>")
     end,
 }

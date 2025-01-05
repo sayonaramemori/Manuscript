@@ -1,6 +1,6 @@
 return {
-    'akinsho/bufferline.nvim', 
-    version = "*", 
+    'akinsho/bufferline.nvim',
+    version = "*",
     lazy = false,
     priority = 500,
     dependencies = {
@@ -17,7 +17,6 @@ return {
             }},
             separator_style = "slant",
             diagnostics = "nvim_lsp",
-
         }
     }
 }
