@@ -23,15 +23,10 @@ wsl --import <Distro> <InstallLocation> <FileName>
 3. 依个人喜好设置 **配色方案** ，**背景图像** 和 **透明度** 等
 
 ### 1.4 Ubuntu Prerequisite  
-- [Nodejs](https://nodejs.org/en/download/package-manager)  
-- [Cmake](https://cmake.org/download/)  
-- [Anaconda](https://repo.anaconda.com/archive/)
 ```
 sudo apt update && sudo apt install -y net-tools gcc g++ unzip make
 
-conda create --name my_env python=3.8.20
-
-conda create --name <new_env_name> --clone <existing_env_name>
+sudo apt search '^python3.[0-9]+.*-venv$'
 ```
 
 ## 2. Mihomo  
@@ -42,61 +37,64 @@ conda create --name <new_env_name> --clone <existing_env_name>
 
 
 ### 2.1 安装和配置  
-1. Download the installer, with [Github Proxy](https://ghp.ci/).  
-```shell
-# Using Github proxy ,here is https://ghp.ci
-# My cpu architecture is x86_64. Choose your version.
 
-curl -L https://ghp.ci/https://github.com/MetaCubeX/mihomo/releases/download/v1.18.10/mihomo-linux-amd64-compatible-go120-v1.18.10.deb -o mihomo.deb  &&
+#### 2.1.1 Installation  
+- Run this cmd first: `export GITHUB_PROXY=https://gh-proxy.com`
+
+```shell
+# Please check whether the Github Proxy is still accessible.
+
+curl -L $GITHUB_PROXY/https://github.com/MetaCubeX/mihomo/releases/download/v1.18.10/mihomo-linux-amd64-compatible-go120-v1.18.10.deb -o mihomo.deb  &&
 sudo apt install ./mihomo.deb
-```
-2. 在 Windows 中打开配置目录，复制 `clash-verge.yaml` and `Country.mmdb` 到 `/etc/mihomo`  
-```shell
-# You could choose other elegant way to achieve file transfermation.
-# For cloud-server, I use sftp here
-# cd [YOUR_WINDOWS_CONFIG_DIR]
-sftp user@host
-put clash-verge.yaml
-put Country.mmdb
-bye
 
+# Remove mihomo
+# sudo systemctl stop mihomo && sudo rm /etc/mihomo -rf && sudo apt remove mihomo && sudo apt autoremove
+```
+#### 2.1.2 Configuration  
+1. 方式一: 下载基础配置`config.yaml` 并导出订阅链接环境变量: `export SUB_URL=[YOUR_SUB_URL]`
+```shell
+#!/bin/bash
+if [ -z $SUB_URL ]; then
+    echo "Please export SUB_URL first. Stop Running"
+    exit 0
+fi
+echo "You Github proxy is $GITHUB_PROXY"
+
+# Downlaod yq for yaml operation
+wget $GITHUB_PROXY/https://github.com/mikefarah/yq/releases/download/v4.44.5/yq_linux_amd64 -O yq &&
+sudo chmod +x yq &&
+sudo mv yq /usr/bin/yq
+
+# Download the base config
+wget $GITHUB_PROXY/https://github.com/sayonaramemori/Manuscript/blob/main/config.yaml -O config.yaml &&
+chmod 666 ./config.yaml &&
+sed -i -e "s|PROXYPLACEHOLDER|$GITHUB_PROXY|g" ./config.yaml
+yq -i '.proxy-providers.one.url = strenv(SUB_URL)' ./config.yaml
+
+sudo mkdir /etc/mihomo/ -p &&
+cat ./config.yaml | sudo tee /etc/mihomo/temp.yaml > /dev/null &&
+sudo cp /etc/mihomo/temp.yaml /etc/mihomo/config.yaml &&
+sudo systemctl restart mihomo &&
+sleep 2 &&
+cd /etc/mihomo/ &&
+yq ea '. as $item ireduce ({}; . * $item )' "/etc/mihomo/proxies/"`sudo ls /etc/mihomo/proxies` temp.yaml | sudo tee config.yaml > /dev/null &&
+sudo systemctl restart mihomo
+```
+2. 方式二：Windows 中打开配置目录，复制 `clash-verge.yaml` and `Country.mmdb` 到 `/etc/mihomo`  
+```shell
 # For wsl, just manually copy them
 explorer.exe .
 
 # Back to Linux
-sudo mv ~/Country.mmdb /etc/mihomo/ && sudo mv ~/clash-verge.yaml /etc/mihomo/config.yaml  && sudo vim /etc/mihomo/config.yaml
-
-# before
-external-controller: 127.0.0.1:9097
-# after
-external-controller: 0.0.0.0:9097
-```
-
-3. Do Test  
-```
-# Port is set in config.yaml with configuration item -- port.
-
-sudo systemctl start mihomo &&
-curl -i google.com --proxy http://127.0.0.1:7899
-
-# If failing, try below and inspect the log
-# journalctl -u mihomo
-```
-
-### 2.2 配置 Web 仪表盘  
-> To select node freely with Web-GUI.  
-```shell
-# Caution: Github proxy also used here
-# Insert the three lines into config.yaml
-# Access via http://{{external-controller}}/ui in browser
-# The IP of your host is needed for accessment.
-# Do remember set secret for security.
+sudo mv ~/Country.mmdb /etc/mihomo/ && 
+sudo mv ~/clash-verge.yaml /etc/mihomo/config.yaml  && 
 
 sudo cat << 'EOF' > /etc/mihomo/temp.yaml
 external-ui: /etc/mihomo/ui
 external-ui-name: my-ui
 external-ui-url: "https://ghp.ci/https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip"
 EOF
+
 sudo cat /etc/mihomo/config.yaml >> /etc/mihomo/temp.yaml  &&
 sudo mv /etc/mihomo/temp.yaml /etc/mihomo/config.yaml  &&
 sudo mkdir /etc/mihomo/ui -p &&
@@ -105,29 +103,32 @@ ip=`ifconfig | grep inet | grep -v 127.0.0.1 | grep -v inet6 | awk '{print$2}'`
 echo "DashBoard-Url: http://${ip}:9097/ui"
 ```
 
+
+### 2.2 Do Test  
+```
+# Port is set in config.yaml with configuration item -- port. In this example, port is 7899
+
+curl -i google.com --proxy http://127.0.0.1:7899
+
+# If failing, try below and inspect the log
+journalctl -u mihomo | tail
+```
 > Test whether web-GUI works fine. Access via http://IP:9097/ui
 ```
-# My port is 7899 here 
-# You should see some information of the node you just have selected
-
-clear
-
 cat << 'EOF' > ~/test_dashboard.sh
 #!/bin/bash
 curl -i google.com --proxy http://127.0.0.1:7899
 curl -i youtube.com --proxy http://127.0.0.1:7899
-curl -i baidu.com --proxy http://127.0.0.1:7899
-journalctl -u mihomo | tail -n 3
+journalctl -u mihomo | tail -n 2
 EOF
-
 chmod +x ~/test_dashboard.sh &&
 bash ~/test_dashboard.sh &&
 rm ~/test_dashboard.sh
 ```
 
-
 ## 3. Neovim  
-> [Github Page](https://github.com/neovim/neovim/blob/master/INSTALL.md)  
+- [Github Page](https://github.com/neovim/neovim/blob/master/INSTALL.md)  
+- Plugin Markdown-Preview Needs [Nodejs](https://nodejs.org/en/download/package-manager)  
 
 > 首先运行如下指令  
 ```shell
@@ -136,19 +137,18 @@ export http_proxy=http://127.0.0.1:7899 && export https_proxy=$http_proxy
 
 
 ### 3.1 安装 Neovim  
-> [Github home page](https://github.com/neovim/neovim/blob/master/INSTALL.md)  
-
-> 安装后 **执行** `echo 'export PATH=$PATH:/opt/nvim-linux64/bin' >> ~/.bashrc && source ~/.bashrc`  
-> 或者 **执行** `sudo ln -s /opt/nvim-linux64/bin/nvim /usr/bin/nvim`
 ```shell
 curl -LO --proxy http://127.0.0.1:7899 https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz &&
 sudo rm -rf /opt/nvim  &&
-sudo tar -C /opt -xzf nvim-linux64.tar.gz
+sudo tar -C /opt -xzf nvim-linux64.tar.gz &&
+sudo ln -s /opt/nvim-linux64/bin/nvim /usr/bin/nvim &&
+sudo rm -rf ./nvim-linux64.tar.gz -
 ```
 
 ### 3.2 配置 Neovim  
-> 这里套用个人配置，可自行搜索Neovim相关配置 :D  
->> 推荐配置： [LunarVim](https://github.com/LunarVim/LunarVim)  
+- 这里套用个人配置，可自行搜索Neovim相关配置 :D  
+- 推荐配置： [LunarVim](https://github.com/LunarVim/LunarVim)  
+- Create link for root : `sudo mkdir /root/.config -p && sudo ln -s /home/{USER_NAME}/.config/nvim /root/.config/nvim`
 ```
 git clone https://github.com/sayonaramemori/Manuscript.git  &&
 cd Manuscript && cd nvim &&
@@ -159,10 +159,10 @@ echo "Done! Using nvim to start editing"
 ```
 
 ## 4. Yazi  
-> [Official Docs](https://yazi-rs.github.io/docs/installation)  
+- [Official Docs](https://yazi-rs.github.io/docs/installation)  
+- [Release Page](https://github.com/sxyazi/yazi/releases)  
 
 ### 4.1 安装 Yazi  
-> [Release Page](https://github.com/sxyazi/yazi/releases)  
 ```shell
 # 通过 Official release 安装
 curl -L --proxy http://127.0.0.1:7899 https://github.com/sxyazi/yazi/releases/download/v0.3.3/yazi-x86_64-unknown-linux-musl.zip -o yazi.zip  &&
@@ -174,13 +174,12 @@ sudo mv ./ya /usr/bin/
 
 
 ### 4.2 Shell Wrapper  
-> Provides the ability to change the current working directory when exiting Yazi.
->> Use `ra` to invoke Yazi.  
->> **Run** `source ~/.bashrc` after operation  
-```shell
-# For bash or zsh
+> Provides the ability to change the current working directory when exiting Yazi.  
 
-cat << 'EOF' >> ~/.bashrc
+-  Use `ra` to invoke Yazi.  
+-  **Run** `. ~/.profile` after operation  
+```shell
+cat << 'EOF' >> ~/.profile
 function ra() {
 	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
 	yazi "$@" --cwd-file="$tmp"
@@ -191,6 +190,7 @@ function ra() {
 }
 EOF
 ```
+
 ```cmd
 # For windows, Create the file ra.cmd and place it in your %PATH%.
 # For Command Prompt
@@ -207,12 +207,10 @@ del "%tmpfile%"
 
 
 ### 4.3 Configuration  
-> There are three configuration files for Yazi.  
-- `yazi.toml`  
-- `keymap.toml`  
-- `theme.toml`  
-> For Unix-like system, they should be placed at `~/.config/yazi/`  
-> For Windows, `C:\Users\Username\AppData\Roming\yazi\config\` is the right place.  
+> 这里套用个人配置，详细配置可前往[官网](https://yazi-rs.github.io/docs/installation)查看  
+
+- For Unix-like system, they should be placed at `~/.config/yazi/`  
+- For Windows, `C:\Users\Username\AppData\Roming\yazi\config\` is the right place.  
 
 ```
 mkdir ~/.config/yazi -p &&
@@ -222,16 +220,12 @@ ya pack -a h-hg/yamb    &&
 ya pack -a yazi-rs/plugins:full-border
 ```
 
-#### 指定 Neovim 为编辑器  
-> For windows, environment variable `YAZI_FILE_ONE` for file is needed. 
->> For example `YAZI_FILE_ONE=C:\Program Files\Git\usr\bin\file.exe`  
+> 指定 Neovim 为编辑器  
+- For windows, environment variable `YAZI_FILE_ONE` for file is needed. 
+- For example `YAZI_FILE_ONE=C:\Program Files\Git\usr\bin\file.exe`  
 ```toml
-# In yazi.toml  
-
 [opener]
-edit = [
-	{ run = "nvim %*",  block = true, desc = "nvim", for = "windows" },
-]
+edit = [ { run = "nvim %*",  block = true, desc = "nvim", for = "windows" }, ]
 ```
 
 ### 4.4 Plugins  
@@ -255,12 +249,93 @@ git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-m
 git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
 ```
+
 > Modify your `.zshrc`, be careful of the order  
 ```
 plugins=(
   git zsh-autosuggestions zsh-syntax-highlighting copypath
 )
 ZSH_THEME="powerlevel10k/powerlevel10k"
+
+# For yazi
+. ~/.profile
 ```
+
+## 6. 杂项  
+
+### 6.1 安装 Docker
+- [Docker Docs](https://docs.docker.com/get-started/)  
+```shell
+#!/bin/bash
+
+# Set proxy variables
+HTTP_PROXY="http://127.0.0.1:7899/"
+HTTPS_PROXY=$HTTP_PROXY
+
+# Step 1: Configure apt to use the proxy
+echo "Configuring apt to use proxy..."
+sudo sh -c "echo 'Acquire::http::Proxy \"$HTTP_PROXY\";' > /etc/apt/apt.conf.d/01proxy"
+sudo sh -c "echo 'Acquire::https::Proxy \"$HTTPS_PROXY\";' >> /etc/apt/apt.conf.d/01proxy"
+
+# Step 2: Add Docker's official GPG key
+echo "Adding Docker's official GPG key..."
+sudo apt-get update
+sudo apt-get install -y ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc --proxy "$HTTP_PROXY"
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+# Step 3: Add the Docker repository to apt sources
+echo "Adding Docker repository to apt sources..."
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+    $(. /etc/os-release && echo \"$VERSION_CODENAME\") stable" | \
+      sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+      # Step 4: Install Docker
+      echo "Installing Docker..."
+      sudo apt-get update
+	  sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+      # Step 5: Configure Docker to use the proxy
+      echo "Configuring Docker to use proxy..."
+      sudo mkdir -p /etc/systemd/system/docker.service.d
+      sudo sh -c "echo '[Service]\nEnvironment=\"HTTP_PROXY=$HTTP_PROXY\"\nEnvironment=\"HTTPS_PROXY=$HTTPS_PROXY\"\nEnvironment=\"NO_PROXY=localhost,127.0.0.1\"' > /etc/systemd/system/docker.service.d/http-proxy.conf"
+
+      # Step 6: Reload systemd and restart Docker
+      echo "Reloading systemd and restarting Docker..."
+      sudo systemctl daemon-reload &&
+      sudo systemctl restart docker
+
+      # Step 7: Test Docker installation by pulling an image
+      echo "Testing Docker installation by pulling the hello-world image..."
+      docker pull hello-world
+      # docker pull teddysun/v2ray
+
+      # Step 8: Clear apt proxy configuration
+      echo "Clearing apt proxy configuration..."
+      sudo rm /etc/apt/apt.conf.d/01proxy
+
+      # Step 9: Clear Docker proxy configuration
+      echo "Clearing Docker proxy configuration..."
+      sudo rm /etc/systemd/system/docker.service.d/http-proxy.conf
+      sudo systemctl daemon-reload &&
+      sudo systemctl restart docker
+
+      sudo docker run --rm --name ciallo hello-world
+```
+
+### 6.2 安装 NodeJs  
+- [Nodejs Installation Page](https://nodejs.org/en/download/package-manager)  
+
+### 6.3 安装 Cmake  
+- [Cmake](https://cmake.org/download/)  
+
+### 6.4 安装 Anaconda  
+- Select your version from the [Distribution Page](https://repo.anaconda.com/archive/).  
+
+### 6.5 安装 rust
+- `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`  
+
 
 
