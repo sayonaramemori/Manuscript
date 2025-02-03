@@ -1,14 +1,13 @@
 -- Be careful about the order of loading
---
--- disable netrw at the very start of your init.lua
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
--- optionally enable 24-bit colour
+-- Optionally enable 24-bit colour
 vim.opt.termguicolors = true
+
+-- Dynamically load the configuration
+vim.cmd('source ' .. vim.fn.stdpath('config') .. '/restore-position.vim')
 
 require("core.keymappings")
 require("core.lazy")
-
-
 
