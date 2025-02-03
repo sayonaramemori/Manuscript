@@ -138,11 +138,11 @@ export http_proxy=http://127.0.0.1:7899 && export https_proxy=$http_proxy
 
 ### 3.1 安装 Neovim  
 ```shell
-curl -LO --proxy http://127.0.0.1:7899 https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz &&
+curl -LO --proxy http://127.0.0.1:7899 https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz &&
 sudo rm -rf /opt/nvim  &&
-sudo tar -C /opt -xzf nvim-linux64.tar.gz &&
-sudo ln -s /opt/nvim-linux64/bin/nvim /usr/bin/nvim &&
-sudo rm -rf ./nvim-linux64.tar.gz -
+sudo tar -C /opt -xzf nvim-linux-x86_64.tar.gz &&
+sudo ln -s /opt/nvim-linux-x86_64/bin/nvim /usr/bin/nvim &&
+sudo rm -rf ./nvim-linux-x86_64.tar.gz -
 ```
 
 ### 3.2 配置 Neovim  
