@@ -153,8 +153,7 @@ sudo rm -rf ./nvim-linux-x86_64.tar.gz -
 git clone https://github.com/sayonaramemori/Manuscript.git  &&
 cd Manuscript && cd nvim &&
 mkdir ~/.config/nvim -p &&
-cp ./init.lua ~/.config/nvim/init.lua &&
-cp -r ./lua ~/.config/nvim/ &&
+cp -r ./* ~/.config/nvim/ &&
 echo "Done! Using nvim to start editing"
 ```
 
@@ -244,7 +243,6 @@ sh -c "$(wget -O- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools
 ### 5.2 Configuration  
 > Plugin Installation  
 ```
-git clone https://github.com/bhilburn/powerlevel9k.git ~/.oh-my-zsh/custom/themes/powerlevel9k
 git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
 git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
